@@ -127,8 +127,8 @@ public class ProguardTask extends BaritoneGradleTask {
 
         // Setup the template that will be used to derive the API and Standalone configs
         List<String> template = Files.readAllLines(getTemporaryFile(PROGUARD_CONFIG_DEST));
-        template.add(0, "-injars '" + this.artifactPath.toString() + "'");
-        template.add(1, "-outjars '" + this.getTemporaryFile(PROGUARD_EXPORT_PATH) + "'");
+        template.add(0, "-injars \"" + this.artifactPath.toString() + "\"");
+        template.add(1, "-outjars \"" + this.getTemporaryFile(PROGUARD_EXPORT_PATH) + "\"");
 
         template.add(2, "-libraryjars  <java.home>/jmods/java.base.jmod(!**.jar;!module-info.class)");
         template.add(3, "-libraryjars  <java.home>/jmods/java.desktop.jmod(!**.jar;!module-info.class)");
@@ -153,14 +153,14 @@ public class ProguardTask extends BaritoneGradleTask {
                         .map(f -> isMcJar(f) ? mcJar : f);
             }
             libraries.forEach(f -> {
-                template.add(2, "-libraryjars '" + f + "'");
+                template.add(2, "-libraryjars \"" + f + "\"");
             });
         }
 
         Files.createDirectories(this.getRootRelativeFile(PROGUARD_MAPPING_DIR));
 
         List<String> api = new ArrayList<>(template);
-        api.add(2, "-printmapping " + new File(this.getRootRelativeFile(PROGUARD_MAPPING_DIR).toFile(), "mappings-" + addCompTypeFirst("api.txt")));
+        api.add(2, "-printmapping \"" + new File(this.getRootRelativeFile(PROGUARD_MAPPING_DIR).toFile(), "mappings-" + addCompTypeFirst("api.txt")) + "\"");
 
         // API config doesn't require any changes from the changes that we made to the template
         Files.write(getTemporaryFile(compType + PROGUARD_API_CONFIG), api);
@@ -168,7 +168,7 @@ public class ProguardTask extends BaritoneGradleTask {
         // For the Standalone config, don't keep the API package
         List<String> standalone = new ArrayList<>(template);
         standalone.removeIf(s -> s.contains("# this is the keep api"));
-        standalone.add(2, "-printmapping " + new File(this.getRootRelativeFile(PROGUARD_MAPPING_DIR).toFile(), "mappings-" + addCompTypeFirst("standalone.txt")));
+        standalone.add(2, "-printmapping \"" + new File(this.getRootRelativeFile(PROGUARD_MAPPING_DIR).toFile(), "mappings-" + addCompTypeFirst("standalone.txt")) + "\"");
         Files.write(getTemporaryFile(compType + PROGUARD_STANDALONE_CONFIG), standalone);
     }
 
